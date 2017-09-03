@@ -1,4 +1,4 @@
-dtb-$(CONFIG_ARCH_MSM8996) += msm8996-v2-pmi8994-cdp.dtb \
+dtb-$(CONFIG_ARCH_MSM8996_DISABLED_FOR_PME) += msm8996-v2-pmi8994-cdp.dtb \
 	msm8996-v2-pmi8994-mtp.dtb \
 	msm8996-v2-pmi8994-pmk8001-cdp.dtb \
 	msm8996-v2-pmi8994-pmk8001-mtp.dtb \
@@ -114,6 +114,25 @@ dtb-$(CONFIG_ARCH_MSM8996) += msm8996-v2-pmi8994-cdp.dtb \
 	apq8096-v3-pmi8996-mdm9x55-i2s-mtp.dtb \
 	apq8096-v3-pmi8996-mdm9x55-slimbus-mtp.dtb \
 	apq8096-v3-pmi8996-dragonboard.dtb
+	
+# HTC msm8996 device dtbs
+dtb-$(CONFIG_ARCH_MSM8996) += \
+	msm8996-v3-htc_pme-pvt.dtb \
+	msm8996-v3-htc_pme-xc.dtb \
+	msm8996-v3-htc_pme-xb.dtb \
+	msm8996-v3-htc_pme-xa.dtb \
+	msm8996-v2-htc_pme-xb.dtb \
+	msm8996-v2-htc_pme-xa.dtb \
+	msm8996-v2-htc_evm.dtb \
+	msm8996-v3-htc_pmeuhljapan-xa.dtb \
+	msm8996-v3-htc_pmeuhljapan-xb.dtb \
+	msm8996-v3-htc_pmewhl-xd.dtb \
+	msm8996-v3-htc_pmewhl-pvt.dtb \
+	msm8996-v3-htc_pmeuhljapan-pvt.dtb \
+	msm8996pro-v1.1-htc_oce-xa.dtb \
+	msm8996pro-v1.1-htc_oce-xb.dtb \
+	msm8996pro-v1.1-htc_oce-xc.dtb \
+	msm8996pro-v1.1-htc_oce-pvt.dtb
 
 dtb-$(CONFIG_MSM_GVM_QUIN) += vplatform-lfv-msm8996.dtb
 

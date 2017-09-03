@@ -3498,34 +3498,7 @@
 		qcom,msm-cpudai-afe-clk-ver = <2>;
 	};
 
-//HTC_AUD_START
-//	qcom,msm-dai-mi2s {
-//		compatible = "qcom,msm-dai-mi2s";
-//		dai_mi2s_sec: qcom,msm-dai-q6-mi2s-sec {
-//			compatible = "qcom,msm-dai-q6-mi2s";
-//			qcom,msm-dai-q6-mi2s-dev-id = <1>;
-//			qcom,msm-mi2s-rx-lines = <1>;
-//			qcom,msm-mi2s-tx-lines = <0>;
-//		};
-//
-//		dai_mi2s: qcom,msm-dai-q6-mi2s-tert {
-//			compatible = "qcom,msm-dai-q6-mi2s";
-//			qcom,msm-dai-q6-mi2s-dev-id = <2>;
-//			qcom,msm-mi2s-rx-lines = <2>;
-//			qcom,msm-mi2s-tx-lines = <1>;
-//			pinctrl-names = "default", "sleep";
-//			pinctrl-0 = <&tert_mi2s_active &tert_mi2s_sd0_active>;
-//			pinctrl-1 = <&tert_mi2s_sleep &tert_mi2s_sd0_sleep>;
-//		};
-//
-//		dai_mi2s_quat: qcom,msm-dai-q6-mi2s-quat {
-//			compatible = "qcom,msm-dai-q6-mi2s";
-//			qcom,msm-dai-q6-mi2s-dev-id = <3>;
-//			qcom,msm-mi2s-rx-lines = <1>;
-//			qcom,msm-mi2s-tx-lines = <0>;
-//		};
-//	};
-//HTC_AUD_END
+
 
 	qcom,msm-dai-tdm-pri-rx {
 		compatible = "qcom,msm-dai-tdm";
