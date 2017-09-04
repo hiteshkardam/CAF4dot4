@@ -45,7 +45,7 @@ find ./ -name '*~' | xargs rm
 
 # make kernel
 
-make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out msm_defconfig
+make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out pme_defconfig
 make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out -j`grep 'processor' /proc/cpuinfo | wc -l`
 
 # Grab zImage-dtb
