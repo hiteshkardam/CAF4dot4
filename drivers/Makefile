@@ -180,10 +180,17 @@ obj-$(CONFIG_FPGA)		+= fpga/
 
 obj-$(CONFIG_BIF)		+= bif/
 
+# HTC debug
+obj-$(CONFIG_HTC_DEBUG)		+= htc_debug/
+
 obj-$(CONFIG_SENSORS_SSC)	+= sensors/
 obj-$(CONFIG_ESOC)              += esoc/
 # htc_ril driver
 obj-y += htc_ril/
+
+#HTC Debug
+obj-$(CONFIG_HTC_DEBUG_FOOTPRINT)	+= htc_mnemosyne/
+
 #HTC LogLevel
 obj-$(CONFIG_HTC_LOGLEVEL)      += htc_loglevel/
 #HTC Security
