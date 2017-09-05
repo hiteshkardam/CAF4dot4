@@ -195,3 +195,6 @@ obj-$(CONFIG_HTC_DEBUG_FOOTPRINT)	+= htc_mnemosyne/
 obj-$(CONFIG_HTC_LOGLEVEL)      += htc_loglevel/
 #HTC Security
 obj-$(CONFIG_HTC_MSM_SERIAL)    += htc_msm_serial/
+
+# <t-base drivers
+obj-$(CONFIG_TRUSTONIC_TEE)     += gud/
