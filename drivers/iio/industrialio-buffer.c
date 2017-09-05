@@ -300,7 +300,7 @@ static bool iio_validate_scan_mask(struct iio_dev *indio_dev,
  * buffers might request, hence this code only verifies that the
  * individual buffers request is plausible.
  */
-static int iio_scan_mask_set(struct iio_dev *indio_dev,
+int iio_scan_mask_set(struct iio_dev *indio_dev,
 		      struct iio_buffer *buffer, int bit)
 {
 	const unsigned long *mask;
