@@ -1,2 +1,14 @@
-obj-y += stability/
 obj-y += partition/
+
+
+obj-y += htc_debug_tools.o
+obj-y += htc_reboot_block.o
+obj-y += helper_funcs.o
+obj-y += htc_process_debug.o
+obj-n += debug_page_user_trace.o
+obj-y += htc_ramoops.o
+obj-y += bootmsg.o
+obj-y += htc_bootloader_log.o
+obj-y += htc_nc_setting.o
+obj-y += htc_restart_timer_notifier.o
+

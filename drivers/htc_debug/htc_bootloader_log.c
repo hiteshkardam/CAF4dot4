@@ -117,7 +117,7 @@ ssize_t bldr_log_read_once(char __user *userbuf, ssize_t klog_size)
 	return len;
 }
 
-ssize_t bldr_log_read(const void *lastk_buf, ssize_t	lastk_size, char __user *userbuf,
+ssize_t bldr_log_read(const void *lastk_buf, ssize_t lastk_size, char __user *userbuf,
 						size_t count, loff_t *ppos)
 {
 	loff_t pos;
@@ -197,21 +197,18 @@ int bldr_log_init(void)
 	np = of_find_compatible_node(NULL, NULL, RAMLOG_COMPATIBLE_NAME);
 
 	if (np) {
-		if (1) {
-			while (of_address_to_resource(np, num_reg, &temp_res) == 0) {
-				if (!strcmp(temp_res.name, RAMLOG_LAST_RSE_NAME))
-					bldr_log_setup(temp_res.start, resource_size(&temp_res), true);
-				else if (!strcmp(temp_res.name, RAMLOG_CUR_RSE_NAME))
-					bldr_log_setup(temp_res.start, resource_size(&temp_res), false);
-				else
-					pr_warn("%s: unknown bldr resource %s\n", __func__, temp_res.name);
+		while (of_address_to_resource(np, num_reg, &temp_res) == 0) {
+			if (!strcmp(temp_res.name, RAMLOG_LAST_RSE_NAME))
+				bldr_log_setup(temp_res.start, resource_size(&temp_res), true);
+			else if (!strcmp(temp_res.name, RAMLOG_CUR_RSE_NAME))
+				bldr_log_setup(temp_res.start, resource_size(&temp_res), false);
+			else
+				pr_warn("%s: unknown bldr resource %s\n", __func__, temp_res.name);
 
-				num_reg++;
-			}
-			if (!num_reg)
-				pr_warn("%s: can't find address resource\n", __func__);
-		} else
-			pr_warn("%s: translate address fail\n", __func__);
+			num_reg++;
+		}
+		if (!num_reg)
+			pr_warn("%s: can't find address resource\n", __func__);
 	} else
 		pr_warn("%s: can't find compatible '%s'\n", __func__, RAMLOG_COMPATIBLE_NAME);
 

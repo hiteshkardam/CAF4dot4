@@ -61,7 +61,7 @@ static int reboot_block_command(int reason, const char* msg)
 	nwrite = kernel_write(filp,
 			(const char*) &block, sizeof(block),
 			poffset);
-	if (nwrite == sizeof(block))
+	if (nwrite == sizeof(reason))
 		dev_info(dev, "wrote reason: %08x\n", reason);
 	else {
 		dev_err(dev, "kernel_write failed: %zd\n", nwrite);
@@ -79,7 +79,6 @@ err:
 #define RESTART_REASON_BOOTLOADER       (RESTART_REASON_BOOT_BASE | 0x00)
 #define RESTART_REASON_REBOOT           (RESTART_REASON_BOOT_BASE | 0x01)
 #define RESTART_REASON_RECOVERY         (RESTART_REASON_BOOT_BASE | 0x02)
-#define RESTART_REASON_LOGGING          (RESTART_REASON_BOOT_BASE | 0x08)
 #define RESTART_REASON_RAMDUMP          (RESTART_REASON_BOOT_BASE | 0xAA)
 #define RESTART_REASON_ERASE_FLASH      (RESTART_REASON_BOOT_BASE | 0xEF)
 
@@ -106,7 +105,6 @@ static struct cmd_reason_map {
 	{ "ftm",            RESTART_REASON_FTM },
 	{ "force-dog-bark", RESTART_REASON_RAMDUMP },
 	{ "power-key-force-hard", RESTART_REASON_RAMDUMP },
-	{ "dm-verity device corrupted", RESTART_REASON_LOGGING },
 };
 
 #define OEM_CMD_FMT "oem-%02x"
