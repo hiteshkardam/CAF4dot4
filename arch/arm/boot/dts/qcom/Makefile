@@ -114,6 +114,7 @@ dtb-$(CONFIG_ARCH_MSM8996_DISABLED_FOR_PME) += msm8996-v2-pmi8994-cdp.dtb \
 	apq8096-v3-pmi8996-mdm9x55-i2s-mtp.dtb \
 	apq8096-v3-pmi8996-mdm9x55-slimbus-mtp.dtb \
 	apq8096-v3-pmi8996-dragonboard.dtb
+
 	
 # HTC msm8996 device dtbs
 dtb-$(CONFIG_ARCH_MSM8996) += \
