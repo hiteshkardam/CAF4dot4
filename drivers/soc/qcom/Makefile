@@ -40,7 +40,7 @@ obj-$(CONFIG_MSM_PIL_MSS_QDSP6V5) += pil-q6v5.o pil-msa.o pil-q6v5-mss.o
 obj-$(CONFIG_MSM_PIL)   +=      peripheral-loader.o
 obj-$(CONFIG_MSM_PFE_WA) += pfe-wa.o
 obj-$(CONFIG_ARCH_MSM8996) += msm_cpu_voltage.o
-
+obj-$(CONFIG_FPR_FPC)  += htc_smi.o
 obj-$(CONFIG_MSM_PERFORMANCE) += msm_performance.o
 
 ifdef CONFIG_MSM_SUBSYSTEM_RESTART
@@ -101,6 +101,7 @@ obj-$(CONFIG_MSM_QBT1000) += qbt1000.o
 obj-$(CONFIG_MSM_RPM_RBCPR_STATS_V2_LOG) += rpm_rbcpr_stats_v2.o
 obj-$(CONFIG_MSM_RPM_STATS_LOG) += rpm_stats.o rpm_master_stat.o rpm_rail_stats.o system_stats.o
 obj-$(CONFIG_MSM_RPM_LOG) += rpm_log.o
+obj-y += rpm_stats_ver.o
 obj-$(CONFIG_QSEE_IPC_IRQ_BRIDGE) += qsee_ipc_irq_bridge.o
 obj-$(CONFIG_WCD_DSP_GLINK) += wcd-dsp-glink.o
 obj-$(CONFIG_QCOM_SMCINVOKE) += smcinvoke.o
