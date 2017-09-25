@@ -32,6 +32,13 @@ enum crash_status {
 	CRASH_STATUS_WDOG_BITE,
 };
 
+#if defined(CONFIG_HTC_FEATURES_SSR)
+enum {
+	DISABLE_RAMDUMP = 0,
+	ENABLE_RAMDUMP,
+};
+#endif
+
 struct device;
 struct module;
 
@@ -96,6 +103,10 @@ struct subsys_desc {
 	bool system_debug;
 	bool ignore_ssr_failure;
 	const char *edge;
+	//Modem_BSP++
+	irqreturn_t (*reboot_req_handler) (int irq, void *dev_id);
+	unsigned int reboot_req_irq;
+	//Modem_BSP--
 };
 
 /**
