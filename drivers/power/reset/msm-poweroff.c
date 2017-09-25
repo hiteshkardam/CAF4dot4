@@ -34,6 +34,7 @@
 #include <soc/qcom/restart.h>
 #include <soc/qcom/watchdog.h>
 #include <soc/qcom/minidump.h>
+#include "htc_restart_handler.h"
 
 #define EMERGENCY_DLOAD_MAGIC1    0x322A4F99
 #define EMERGENCY_DLOAD_MAGIC2    0xC67E4350
@@ -63,6 +64,8 @@ static void scm_disable_sdi(void);
  * So the SDI cannot be re-enabled when it already by-passed.
 */
 
+static int in_panic;
+static int is_warm_reset = 0;
 #ifdef CONFIG_QCOM_DLOAD_MODE
 #define EDL_MODE_PROP "qcom,msm-imem-emergency_download_mode"
 #define DL_MODE_PROP "qcom,msm-imem-download_mode"
@@ -244,6 +247,7 @@ void msm_set_restart_mode(int mode)
 }
 EXPORT_SYMBOL(msm_set_restart_mode);
 
+
 /*
  * Force the SPMI PMIC arbiter to shutdown so that no more SPMI transactions
  * are sent from the MSM to the PMIC.  This is required in order to avoid an
@@ -268,7 +272,38 @@ static void halt_spmi_pmic_arbiter(void)
 	}
 }
 
-static void msm_restart_prepare(const char *cmd)
+static enum pon_power_off_type htc_restart_cmd_to_type(const char* cmd)
+{
+        int i;
+
+        struct {
+                const char* cmd;
+                enum pon_power_off_type type;
+        } cmd_type[] = {
+                {"power-key-force-hard", PON_POWER_OFF_WARM_RESET},
+                {"force-dog-bark", PON_POWER_OFF_WARM_RESET},
+                        /* OEM RIL fatal: oem-95, 96, 98, 99 */
+                {"oem-93", PON_POWER_OFF_WARM_RESET},
+                {"oem-94", PON_POWER_OFF_WARM_RESET},
+                {"oem-95", PON_POWER_OFF_WARM_RESET},
+                {"oem-96", PON_POWER_OFF_WARM_RESET},
+                {"oem-97", PON_POWER_OFF_WARM_RESET},
+                {"oem-98", PON_POWER_OFF_WARM_RESET},
+                {"oem-99", PON_POWER_OFF_WARM_RESET},
+        };
+
+        if (in_panic)
+                return PON_POWER_OFF_WARM_RESET;
+
+        cmd = cmd ? : "";
+        for (i = 0; i < ARRAY_SIZE(cmd_type); i++)
+                if (!strncmp(cmd, cmd_type[i].cmd, strlen(cmd_type[i].cmd)))
+                        return cmd_type[i].type;
+
+        return PON_POWER_OFF_HARD_RESET; /* default reset type */
+}
+
+static void msm_restart_prepare(char mode, const char *cmd)
 {
 	bool need_warm_reset = false;
 
@@ -280,8 +315,11 @@ static void msm_restart_prepare(const char *cmd)
 	 */
 
 	set_dload_mode(download_mode &&
-			(in_panic || restart_mode == RESTART_DLOAD));
+			(in_panic || restart_mode == RESTART_DLOAD ||
+				htc_restart_cmd_to_type(cmd) == PON_POWER_OFF_WARM_RESET));
 #endif
+
+	pr_info("%s: restart by command: [%s]\r\n", __func__, (cmd) ? cmd : "");
 
 	if (qpnp_pon_check_hard_reset_stored()) {
 		/* Set warm reset as true when device is in dload mode */
@@ -291,17 +329,20 @@ static void msm_restart_prepare(const char *cmd)
 			need_warm_reset = true;
 	} else {
 		need_warm_reset = (get_dload_mode() ||
-				(cmd != NULL && cmd[0] != '\0'));
+				(htc_restart_cmd_to_type(cmd) == PON_POWER_OFF_WARM_RESET));
 	}
 
 	/* Hard reset the PMIC unless memory contents must be maintained. */
 	if (need_warm_reset) {
 		qpnp_pon_system_pwr_off(PON_POWER_OFF_WARM_RESET);
+		is_warm_reset = 1;
 	} else {
 		qpnp_pon_system_pwr_off(PON_POWER_OFF_HARD_RESET);
 	}
 
-	if (cmd != NULL) {
+	if (in_panic){
+		/* KP, do not overwrite the restart reason */
+	} else if (cmd != NULL) {
 		if (!strncmp(cmd, "bootloader", 10)) {
 			qpnp_pon_set_restart_reason(
 				PON_RESTART_REASON_BOOTLOADER);
@@ -335,9 +376,16 @@ static void msm_restart_prepare(const char *cmd)
 					     restart_reason);
 		} else if (!strncmp(cmd, "edl", 3)) {
 			enable_emergency_dload_mode();
+                } else if (!strncmp(cmd, "download", 8 )) {
+                        set_restart_action(0x6f656d00 | 0xe0, NULL);
+                } else if (!strncmp(cmd, "ftm", 3)) {
+                        set_restart_action(0x6f656d00 | 0xe1, NULL);
+
 		} else {
 			__raw_writel(0x77665501, restart_reason);
 		}
+	} else {
+		set_restart_action(RESTART_REASON_REBOOT, NULL);
 	}
 
 	flush_cache_all();
@@ -377,7 +425,7 @@ static void do_msm_restart(enum reboot_mode reboot_mode, const char *cmd)
 {
 	pr_notice("Going down for restart now\n");
 
-	msm_restart_prepare(cmd);
+	msm_restart_prepare((char)reboot_mode, cmd);
 
 #ifdef CONFIG_QCOM_DLOAD_MODE
 	/*
@@ -385,7 +433,7 @@ static void do_msm_restart(enum reboot_mode reboot_mode, const char *cmd)
 	 * device will take the usual restart path.
 	 */
 
-	if (WDOG_BITE_ON_PANIC && in_panic)
+	if ((WDOG_BITE_ON_PANIC && in_panic) || is_warm_reset)
 		msm_trigger_wdog_bite();
 #endif
 
@@ -548,6 +596,14 @@ static int msm_restart_probe(struct platform_device *pdev)
 	struct device_node *np;
 	int ret = 0;
 
+	ret = htc_restart_handler_init();
+	if (ret) {
+		pr_err("htc restart handler init fail\n");
+		goto err_htc_restart_handle;
+	}
+
+	atomic_notifier_chain_register(&panic_notifier_list, &panic_blk);
+
 #ifdef CONFIG_QCOM_DLOAD_MODE
 	if (scm_is_call_available(SCM_SVC_BOOT, SCM_DLOAD_CMD) > 0)
 		scm_dload_supported = true;
@@ -665,6 +721,7 @@ err_restart_reason:
 	iounmap(emergency_dload_mode_addr);
 	iounmap(dload_mode_addr);
 #endif
+err_htc_restart_handle:
 	return ret;
 }
 
