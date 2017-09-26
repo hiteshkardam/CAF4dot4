@@ -121,13 +121,14 @@ static ssize_t tfa9888_read(struct file *file, char __user *buffer, size_t lengt
 	return rc;
 }
 
+/*
 static void tfa9888_version(unsigned char* ver) {
 	unsigned char get_ver[1] = {0x03};
 
 	tfa_i2c_write(get_ver, 1);
 	tfa_i2c_read(ver, 2);
 }
-
+*/
 static int tfa9888_open(struct inode *inode, struct file *file)
 {
 	return 0;
@@ -169,7 +170,7 @@ int tfa9888_probe(struct i2c_client *client, const struct i2c_device_id *id)
 		goto err;
 	}
 
-	htc_acoustic_register_spk_version(tfa9888_version);
+//	htc_acoustic_register_spk_version(tfa9888_version);
 
 	return 0;
 
