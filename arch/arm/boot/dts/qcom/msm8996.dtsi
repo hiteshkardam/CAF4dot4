@@ -273,7 +273,6 @@
 };
 
 #include "msm8996-ion.dtsi"
-#include "msm8996-sde.dtsi"
 #include "msm8996-mdss.dtsi"
 #include "msm8996-mdss-pll.dtsi"
 #include "msm8996-smp2p.dtsi"
@@ -298,7 +297,8 @@
 		compatible = "qcom,cpumx-8996";
 		reg = <0x70148 0x4>;
 	};
-	
+
+
         spmi_bus: qcom,spmi@400f000 {
                 compatible = "qcom,spmi-pmic-arb";
                 reg = <0x400f000 0xc00>,
@@ -1435,7 +1435,7 @@
 		gdsc-vdd-supply = <&gdsc_pcie_0>;
 		vreg-1.8-supply = <&pm8994_l12>;
 		vreg-0.9-supply = <&pm8994_l28>;
-		vreg-cx-supply = <&pm8994_s1_corner>;
+		vreg-cx-supply = <&pm8994_s1_corner_ao>;
 
 		qcom,vreg-0.9-voltage-level = <925000 925000 24000>;
 		qcom,vreg-cx-voltage-level = <7 4 0>;
@@ -2421,6 +2421,7 @@
 		// removed pm8994_l18_pin_ctrl since it belongs to touch team.
 		//wlan-ant-switch-supply = <&pm8994_l18_pin_ctrl>;
 		/* HTC_WIFI_END */
+		qcom,wlan-en-vreg-support;
 		qcom,notify-modem-status;
 		pinctrl-names = "bootstrap_active", "bootstrap_sleep";
 		pinctrl-0 = <&cnss_bootstrap_active>;
@@ -2968,13 +2969,13 @@
 	mitigation_profile0: qcom,limit_info-0 {
 		qcom,temperature-sensor = <&sensor_information4>;
 		qcom,boot-frequency-mitigate;
-		qcom,hotplug-mitigation-enable;
+		/*qcom,hotplug-mitigation-enable;*/
 	};
 
 	mitigation_profile1: qcom,limit_info-1 {
 		qcom,temperature-sensor = <&sensor_information6>;
 		qcom,boot-frequency-mitigate;
-		qcom,hotplug-mitigation-enable;
+		/*qcom,hotplug-mitigation-enable;*/
 	};
 
 	mitigation_profile2: qcom,limit_info-2 {
@@ -3040,8 +3041,6 @@
 		qcom,bcl-enable;
 		qcom,bcl-framework-interface;
 		qcom,bcl-freq-control-list = <&CPU2 &CPU3>;
-		qcom,bcl-hotplug-list = <&CPU2 &CPU3>;
-		qcom,bcl-soc-hotplug-list = <&CPU2 &CPU3>;
 		qcom,ibat-monitor {
 			qcom,low-threshold-uamp = <3400000>;
 			qcom,high-threshold-uamp = <4200000>;
