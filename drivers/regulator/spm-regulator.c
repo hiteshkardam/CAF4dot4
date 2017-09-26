@@ -941,88 +941,6 @@ static int qpnp_smps_init_step_rate(struct spm_vreg *vreg)
 	return rc;
 }
 
-static int qpnp_smps_check_constraints(struct spm_vreg *vreg,
-					struct regulator_init_data *init_data)
-{
-	int rc = 0, limit_min_uV, limit_max_uV;
-	u16 ul_reg, ll_reg;
-	u8 reg[2];
-
-	limit_min_uV = 0;
-	limit_max_uV = INT_MAX;
-
-	ul_reg = QPNP_FTS_REG_VOLTAGE_ULS_VALID;
-	ll_reg = QPNP_FTS_REG_VOLTAGE_LLS_VALID;
-
-	switch (vreg->regulator_type) {
-	case QPNP_TYPE_HF:
-		ul_reg = QPNP_HF_REG_VOLTAGE_ULS;
-		ll_reg = QPNP_HF_REG_VOLTAGE_LLS;
-	case QPNP_TYPE_FTS2:
-	case QPNP_TYPE_FTS2p5:
-		rc = regmap_bulk_read(vreg->regmap, vreg->spmi_base_addr
-					+ QPNP_SMPS_REG_UL_LL_CTRL, reg, 1);
-		if (rc) {
-			dev_err(&vreg->pdev->dev, "%s: UL_LL register read failed, rc=%d\n",
-				__func__, rc);
-			return rc;
-		}
-
-		if (reg[0] & QPNP_COMMON_UL_EN_MASK) {
-			rc = regmap_bulk_read(vreg->regmap, vreg->spmi_base_addr
-						+ ul_reg, &reg[1], 1);
-			if (rc) {
-				dev_err(&vreg->pdev->dev, "%s: ULS register read failed, rc=%d\n",
-					__func__, rc);
-				return rc;
-			}
-
-			limit_max_uV = spm_regulator_vlevel_to_uv(vreg, reg[1]);
-		}
-
-		if (reg[0] & QPNP_COMMON_LL_EN_MASK) {
-			rc = regmap_bulk_read(vreg->regmap, vreg->spmi_base_addr
-						+ ll_reg, &reg[1], 1);
-			if (rc) {
-				dev_err(&vreg->pdev->dev, "%s: LLS register read failed, rc=%d\n",
-					__func__, rc);
-				return rc;
-			}
-
-			limit_min_uV = spm_regulator_vlevel_to_uv(vreg, reg[1]);
-		}
-
-		break;
-	case QPNP_TYPE_FTS426:
-		rc = regmap_bulk_read(vreg->regmap, vreg->spmi_base_addr
-					+ QPNP_FTS426_REG_VOLTAGE_ULS_LB,
-					reg, 2);
-		if (rc) {
-			dev_err(&vreg->pdev->dev, "%s: could not read voltage limit registers, rc=%d\n",
-				__func__, rc);
-			return rc;
-		}
-
-		limit_max_uV = spm_regulator_vlevel_to_uv(vreg,
-					((unsigned)reg[1] << 8) | reg[0]);
-		break;
-	case QPNP_TYPE_ULT_HF:
-		/* no HW voltage limit configuration */
-		break;
-	}
-
-	if (init_data->constraints.min_uV < limit_min_uV
-	    || init_data->constraints.max_uV >  limit_max_uV) {
-		dev_err(&vreg->pdev->dev, "regulator min/max(%d/%d) constraints do not fit within HW configured min/max(%d/%d) constraints\n",
-			init_data->constraints.min_uV,
-			init_data->constraints.max_uV, limit_min_uV,
-			limit_max_uV);
-		return -EINVAL;
-	}
-
-	return rc;
-}
-
 static bool spm_regulator_using_range0(struct spm_vreg *vreg)
 {
 	return vreg->range == &fts2_range0 || vreg->range == &fts2p5_range0
@@ -1202,13 +1120,6 @@ static int spm_regulator_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "%s: node is missing regulator name\n",
 			__func__);
 		return -EINVAL;
-	}
-
-	rc = qpnp_smps_check_constraints(vreg, init_data);
-	if (rc) {
-		dev_err(&pdev->dev, "%s: regulator constraints check failed, rc=%d\n",
-			__func__, rc);
-		return rc;
 	}
 
 	vreg->rdesc.name	= init_data->constraints.name;
