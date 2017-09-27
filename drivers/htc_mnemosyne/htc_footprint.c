@@ -27,14 +27,14 @@
     To make sure footprint driver work well, just redefine original CPUs' information at footprint driver.
 */
 #undef MAX_CORES_PER_CLUSTER
-#define MAX_CORES_PER_CLUSTER 4 // re-define as 4
+#define MAX_CORES_PER_CLUSTER 2 // re-define as 2
 
 #undef MAX_NUM_OF_CLUSTERS
 #define MAX_NUM_OF_CLUSTERS 2  // re-define as 2
 
 #ifdef NR_CPUS
 #undef NR_CPUS
-#define NR_CPUS ((MAX_CORES_PER_CLUSTER) * (MAX_NUM_OF_CLUSTERS)) // re-define as 8
+#define NR_CPUS ((MAX_CORES_PER_CLUSTER) * (MAX_NUM_OF_CLUSTERS)) // re-define as 4
 #endif
 
 #define S2H(c)		cpu_sw_idx_to_hw_idx(c)
