@@ -214,6 +214,7 @@ source "drivers/bif/Kconfig"
 
 source "drivers/sensors/Kconfig"
 
+source "drivers/gud/Kconfig"
 
 source "drivers/htc_msm_serial/Kconfig"
 
