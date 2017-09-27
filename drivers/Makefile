@@ -171,6 +171,9 @@ obj-$(CONFIG_MCB)		+= mcb/
 obj-$(CONFIG_PERF_EVENTS)	+= perf/
 obj-$(CONFIG_RAS)		+= ras/
 obj-$(CONFIG_THUNDERBOLT)	+= thunderbolt/
+# HTC debug
+obj-y		+= htc_debug/
+
 obj-$(CONFIG_CORESIGHT)		+= hwtracing/coresight/
 obj-y				+= hwtracing/intel_th/
 obj-$(CONFIG_STM)		+= hwtracing/stm/
@@ -182,6 +185,8 @@ obj-$(CONFIG_BIF)		+= bif/
 
 obj-$(CONFIG_SENSORS_SSC)	+= sensors/
 obj-$(CONFIG_ESOC)              += esoc/
+# HTC debug
+obj-$(CONFIG_HTC_DEBUG)   += htc_debug/
 #HTC Debug
 obj-$(CONFIG_HTC_DEBUG_FOOTPRINT)      += htc_mnemosyne/
 #HTC LogLevel
