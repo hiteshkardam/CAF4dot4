@@ -1811,6 +1811,36 @@ err_bus:
 	destroy_workqueue(ssr_wq);
 	return ret;
 }
+
+void htc_smp2p_notify_modem_app_reboot( bool enable )
+{
+  struct subsys_device *htc_modem_dev;
+  struct subsys_desc *subsys;
+
+  htc_modem_dev = find_subsys("modem");
+  if ( htc_modem_dev ) {
+    subsys = htc_modem_dev->desc;
+    gpio_set_value(htc_modem_dev->desc->apps_reboot_gpio , enable );
+  }
+  else
+    pr_err("%s: modem device not found\n",__func__);
+}
+
+bool htc_check_modem_crash_status( void )
+{
+  struct subsys_device *htc_modem_dev;
+
+  htc_modem_dev = find_subsys("modem");
+  if ( htc_modem_dev )
+    return htc_modem_dev->crashed;
+  else {
+    pr_err("%s: modem device not found\n",__func__);
+    return false;
+  }
+}
+
+
+
 arch_initcall(subsys_restart_init);
 
 MODULE_DESCRIPTION("Subsystem Restart Driver");
