@@ -184,3 +184,5 @@ obj-$(CONFIG_SENSORS_SSC)	+= sensors/
 obj-$(CONFIG_ESOC)              += esoc/
 #HTC LogLevel
 obj-$(CONFIG_HTC_LOGLEVEL)      += htc_loglevel/
+#HTC Security
+obj-$(CONFIG_HTC_MSM_SERIAL)    += htc_msm_serial/
