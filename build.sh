@@ -13,7 +13,13 @@
 #  make clean
 
 # Setup the build
- mkdir $k/arch/arm64/configs/INDIAN
+if [ -e $k/arch/arm64/configs/INDIAN ]
+then
+    echo "Placeholder Exists"
+else
+	mkdir $k/arch/arm64/configs/INDIAN
+    echo "Placeholder Created"
+fi
  touch $k/arch/arm64/configs/INDIAN/MAFIA
  cd $k/arch/arm64/configs/INDIAN
     for c in *
@@ -32,7 +38,7 @@
 #  m=$k/out/$c/system/lib/modules
 #  z=$c-$today
 
-TOOLCHAIN=/home/home/android/TC/bin/aarch64-linux-android-
+TOOLCHAIN=/home/assassin/android/TC/bin/aarch64-linux-android-
 export ARCH=arm64
 export SUBARCH=arm64
 
@@ -40,7 +46,7 @@ export SUBARCH=arm64
 # make CROSS_COMPILE=$TOOLCHAIN -j`grep 'processor' /proc/cpuinfo | wc -l` mrproper
  
 # remove backup files
-find ./ -name '*~' | xargs rm
+# find ./ -name '*~' | xargs rm
 # rm compile.log
 
 # make kernel
@@ -67,7 +73,7 @@ make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out -j`grep 'processor' /proc/cpuinfo
 #       7z a -tzip -mx5 "$z.zip"
 #         mv $z.zip $k/out/$z.zip
 # cp $k/out/$z.zip $db/$z.zip
-           rm -rf $k/out/$c
+#           rm -rf $k/out/$c
 # Line below for debugging purposes,  uncomment to stop script after each config is run
 read this
       done

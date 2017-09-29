@@ -1143,12 +1143,10 @@ static int pil_tz_driver_probe(struct platform_device *pdev)
 		} else {
 			pr_info("%s: CONFIG_HTC_FEATURES_SSR_LPASS_ENABLE, RESET_SUBSYS_COUPLED.\n", __func__);
 			subsys_set_restart_level(d->subsys, RESET_SUBSYS_COUPLED);
-#if 1
 			if (get_radio_flag() & BIT(3))
 				subsys_set_enable_ramdump(d->subsys, ENABLE_RAMDUMP);
 			else
 				subsys_set_enable_ramdump(d->subsys, DISABLE_RAMDUMP);
-#endif
 		}
 #else
 		if (get_kernel_flag() & (KERNEL_FLAG_ENABLE_SSR_LPASS)) {

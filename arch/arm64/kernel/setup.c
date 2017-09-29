@@ -40,7 +40,6 @@
 #include <linux/proc_fs.h>
 #include <linux/memblock.h>
 #include <linux/of_iommu.h>
-#include <linux/of_address.h>
 #include <linux/of_fdt.h>
 #include <linux/of_platform.h>
 #include <linux/efi.h>
@@ -450,5 +449,4 @@ static int __init register_kernel_offset_dumper(void)
 				       &kernel_offset_notifier);
 	return 0;
 }
-
 __initcall(register_kernel_offset_dumper);

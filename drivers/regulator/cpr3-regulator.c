@@ -5508,7 +5508,8 @@ static ssize_t cpr3_debug_info_read(struct file *file, char __user *buff,
 	ssize_t len, ret = 0;
 	int i, ro_sel;
 	u32 *quot;
-
+	
+	printk("CPR3 DEBUG INFO START: ADDED BY HTC");
 	vreg = thread->vreg;
 	fuse = vreg->platform_fuses;
 	debugfs_buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
@@ -5621,6 +5622,7 @@ static void cpr3_regulator_debugfs_thread_add(struct cpr3_thread *thread)
 			thread, &cpr3_debug_info_fops);
 	if (IS_ERR_OR_NULL(temp)) {
 		cpr3_err(ctrl, "cpr_debug_info debugfs file creation failed\n");
+	printk("LINE 5625 CPR3 REGULATOR ADDED BY HTC");
 		return;
 	}
 

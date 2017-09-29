@@ -20,6 +20,7 @@
 #include <asm/cputype.h>
 #include <asm/cpufeature.h>
 #include <asm/elf.h>
+#include <linux/of_address.h>
 
 #include <linux/bitops.h>
 #include <linux/bug.h>
@@ -35,6 +36,8 @@
 #include <linux/smp.h>
 #include <linux/delay.h>
 #include <linux/of_fdt.h>
+#include <asm/io.h>
+
 
 char* (*arch_read_hardware_id)(void);
 EXPORT_SYMBOL(arch_read_hardware_id);
@@ -46,6 +49,66 @@ EXPORT_SYMBOL(arch_read_hardware_id);
  */
 DEFINE_PER_CPU(struct cpuinfo_arm64, cpu_data);
 static struct cpuinfo_arm64 boot_cpu_data;
+
+static u32 cx_fuse_data = 0x0;
+static u32 mx_fuse_data = 0x0;
+
+static const u32 vddcx_pvs_retention_data[8] =
+{
+   600000,
+   550000,
+   500000,
+   450000,
+   400000,
+   400000, 
+   400000, 
+   600000
+};
+
+static const u32 vddmx_pvs_retention_data[8] =
+{
+   700000,
+   650000,
+   580000,
+   550000,
+   490000,
+   490000,
+   490000,
+   490000
+};
+
+static int read_cx_fuse_setting(void){
+	if(cx_fuse_data != 0x0)
+		return ((cx_fuse_data & (0x7 << 29)) >> 29);
+	else
+		return -ENOMEM;
+}
+
+static int read_mx_fuse_setting(void){
+	if(mx_fuse_data != 0x0)
+		return ((mx_fuse_data & (0x7 << 2)) >> 2);
+	else
+		return -ENOMEM;
+}
+
+static  u32 Get_min_cx(void) {
+	u32 lookup_val = 0;
+	int mapping_data;
+	mapping_data = read_cx_fuse_setting();
+	if(mapping_data >= 0)
+ 	lookup_val = vddcx_pvs_retention_data[mapping_data];
+ return lookup_val;
+}
+
+static  u32 Get_min_mx(void) {
+ u32 lookup_val = 0;
+ int mapping_data;
+ mapping_data = read_mx_fuse_setting();
+ if(mapping_data >= 0)
+ 	lookup_val = vddmx_pvs_retention_data[mapping_data];
+ return lookup_val;
+}
+
 
 static char *icache_policy_str[] = {
 	[ICACHE_POLICY_RESERVED] = "RESERVED/UNKNOWN",
@@ -128,6 +191,9 @@ static int c_show(struct seq_file *m, void *v)
 		if (compat)
 			seq_printf(m, "model name\t: ARMv8 Processor rev %d (%s)\n",
 				   MIDR_REVISION(midr), COMPAT_ELF_PLATFORM);
+				   
+		seq_printf(m, "min_vddcx\t: %d\n", Get_min_cx());
+ 		seq_printf(m, "min_vddmx\t: %d\n", Get_min_mx());
 
 		seq_printf(m, "BogoMIPS\t: %lu.%02lu\n",
 			   loops_per_jiffy / (500000UL/HZ),
@@ -286,3 +352,42 @@ void __init cpuinfo_store_boot_cpu(void)
 	boot_cpu_data = *info;
 	init_cpu_features(&boot_cpu_data);
 }
+
+static int msm8996_read_cx_fuse(void){
+	void __iomem *addr;
+	struct device_node *dn = of_find_compatible_node(NULL,
+						NULL, "qcom,cpucx-8996");
+	printk("MSM8996 READ CX FUSE: ADDED BY HTC /n");
+	if (dn && (cx_fuse_data == 0x0)) {
+		addr = of_iomap(dn, 0);
+		if (!addr)
+			return -ENOMEM;
+		cx_fuse_data = readl_relaxed(addr);
+		iounmap(addr);
+	}
+	else {
+		return -ENOMEM;
+	}
+	return 0;
+}
+arch_initcall(msm8996_read_cx_fuse);
+
+static int msm8996_read_mx_fuse(void){
+	void __iomem *addr;
+	struct device_node *dn = of_find_compatible_node(NULL,
+						NULL, "qcom,cpumx-8996");
+	printk("MSM8996 READ MX FUSE: ADDED BY HTC /n");
+	if (dn && (mx_fuse_data == 0x0)) {
+		addr = of_iomap(dn, 0);
+		if (!addr)
+			return -ENOMEM;
+		mx_fuse_data = readl_relaxed(addr);
+		iounmap(addr);
+	}
+	else {
+		return -ENOMEM;
+	}
+	return 0;
+}
+
+arch_initcall(msm8996_read_mx_fuse);

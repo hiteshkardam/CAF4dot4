@@ -1713,6 +1713,8 @@ static void bak_htc_target_quot(struct cpr3_controller *ctrl)
 	struct cpr3_thread *thread;
 	struct cpr3_regulator *vreg;
 	int i, size;
+	
+	printk("CPR3 HMSS REGULATOR START: ADDED BY HTC");
 
 	/* The number of target_quot array should be same with cpr thread counter */
 	size = sizeof(htc_target_quot)/sizeof(u64);
