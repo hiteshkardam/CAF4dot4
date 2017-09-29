@@ -42,38 +42,6 @@
 		};
 	};
 
-	tpiu: tpiu@3020000 {
-		compatible = "arm,primecell";
-		arm,primecell-periphid = <0x0003b912>;
-
-		reg = <0x3020000 0x1000>;
-		reg-names = "tpiu-base";
-
-		coresight-name = "coresight-tpiu";
-
-		vdd-supply = <&pm8994_l21>;
-		qcom,vdd-voltage-level = <2950000 2950000>;
-		qcom,vdd-current-level = <200 800000>;
-
-		vdd-io-supply = <&pm8994_l13>;
-		qcom,vdd-io-voltage-level = <2950000 2950000>;
-		qcom,vdd-io-current-level = <200 22000>;
-
-		qcom,nidntsw;
-		qcom,nidnt-swduart;
-		qcom,nidnt-swdtrc;
-
-		clocks = <&clock_gcc clk_qdss_clk>,
-			 <&clock_gcc clk_qdss_a_clk>;
-		clock-names = "apb_pclk", "core_a_clk";
-
-		port{
-			tpiu_in_replicator: endpoint {
-				slave-mode;
-				remote-endpoint = <&replicator_out_tpiu>;
-			};
-		};
-	};
 
 	replicator: replicator@3026000 {
 		compatible = "arm,primecell";
@@ -100,13 +68,6 @@
 				};
 			};
 			port@1 {
-				reg = <1>;
-				replicator_out_tpiu:endpoint {
-					remote-endpoint =
-						<&tpiu_in_replicator>;
-				};
-			};
-			port@2 {
 				reg = <0>;
 				replicator_in_tmc_etf:endpoint {
 					slave-mode;
