@@ -52,7 +52,7 @@ export SUBARCH=arm64
 
 # make kernel
 
-make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out regen_defconfig
+make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out oldregen_defconfig
 make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out -j`grep 'processor' /proc/cpuinfo | wc -l`
 
 # Grab zImage-dtb
@@ -75,6 +75,7 @@ make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out -j`grep 'processor' /proc/cpuinfo
 #         mv $z.zip $k/out/$z.zip
 # cp $k/out/$z.zip $db/$z.zip
 #           rm -rf $k/out/$c
+
 # Line below for debugging purposes,  uncomment to stop script after each config is run
 #read this
       done
