@@ -377,9 +377,8 @@ static int fw_get_filesystem_firmware(struct device *device,
 {
 	int i, len;
 	int rc = -ENOENT;
-	char *path;
+	char *path = __getname();
 
-	path = __getname();
 		//++ Modem BSP, support dynamic modem image switch
         const char* radio_image_select_path = "/dev/block/bootdevice/by-name/fsc";
         //const char* radio_image_select_path = "dev/block/mmcblk0p45";
