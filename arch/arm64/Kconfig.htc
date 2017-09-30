@@ -6,9 +6,15 @@ menuconfig HTC_DEBUG
 	  Enable collection of debug features.
 	  This feature is enabled in defconfig.
 
+config HTC_LOGLEVEL
+  bool "HTC log level"
+  default y
+  help
+    Say yes to enable get log level.
+
 config HTC_DEBUG_RTB
 	default n
-	depends on HTC_DEBUG && MSM_RTB
+	depends on HTC_DEBUG && QCOM_RTB
 	bool "HTC style rtb debug features"
 	help
 	  Say Y here if you want the HTC style rtb debug features
@@ -26,6 +32,25 @@ config HTC_POWER_DEBUG
 	  Use this to enable htc power debug feature including pm statistics,
 	  clock/gpio/qpnp pin dump, wakeup source, kerenl top and autosuspend
 	  stage footprint
+	  
+config HTC_DEBUG_RTB
+	default y
+	depends on HTC_DEBUG && QCOM_RTB
+	bool "HTC style rtb debug features"
+	help
+	  Say Y here if you want the HTC style rtb debug features
+
+config HTC_DEBUG_WORKQUEUE
+	bool "HTC style workqueue debug features"
+	depends on HTC_DEBUG
+	help
+	  Say Y here if you want the HTC style workqueue debug features
+
+config HTC_DEBUG_WATCHDOG
+	bool "HTC style watchdog debug features"
+	depends on HTC_DEBUG && QCOM_WATCHDOG_V2
+	help
+	  Say Y here if you want the HTC style watchdog debug features
 
 comment "HTC features"
 menuconfig HTC_FEATURES
@@ -78,6 +103,11 @@ config HTC_FEATURES_SSR_WCNSS_ENABLE
 	default n
 	help
 	  Say Y here if you want the HTC style for wcnss ssr features
+
+config HTC_FD_MONITOR
+	bool "fd operation monitor mechanism"
+	default n
+
 
 config HTC_DEBUG_MEM_DUMP_TABLE
 	bool "HTC style memory dump table features"

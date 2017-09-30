@@ -370,7 +370,7 @@ static int msm8996_read_cx_fuse(void){
 	}
 	return 0;
 }
-arch_initcall_sync(msm8996_read_cx_fuse);
+arch_initcall(msm8996_read_cx_fuse);
 
 static int msm8996_read_mx_fuse(void){
 	void __iomem *addr;
@@ -389,4 +389,4 @@ static int msm8996_read_mx_fuse(void){
 	return 0;
 }
 
-arch_initcall_sync(msm8996_read_mx_fuse);
+arch_initcall(msm8996_read_mx_fuse);
