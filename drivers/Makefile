@@ -185,7 +185,7 @@ obj-$(CONFIG_SENSORS_SSC)	+= sensors/
 obj-$(CONFIG_ESOC)              += esoc/
 
 # HTC debug
-obj-$(CONFIG_HTC_DEBUG)		+= htc_debug/
+obj-y		+= htc_debug/
 
 # htc_ril driver
 obj-y += htc_ril/
