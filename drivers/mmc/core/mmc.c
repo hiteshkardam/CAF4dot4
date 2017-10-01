@@ -353,6 +353,77 @@ static void mmc_manage_gp_partitions(struct mmc_card *card, u8 *ext_csd)
 #define MMC_MIN_PART_SWITCH_TIME	300
 
 /*
+ * Show CID/EXT_CSD in kernel log
+ */
+static void htc_mmc_show_cid_ext_csd(struct mmc_card *card, u8 *ext_csd)
+{
+	char *buf;
+	int i, j;
+	ssize_t n = 0;
+	char *check_fw;
+
+	if (mmc_card_mmc(card)) {
+		pr_info("%s: cid %08x%08x%08x%08x\n",
+			mmc_hostname(card->host),
+			card->raw_cid[0], card->raw_cid[1],
+			card->raw_cid[2], card->raw_cid[3]);
+		pr_info("%s: csd %08x%08x%08x%08x\n",
+			mmc_hostname(card->host),
+			card->raw_csd[0], card->raw_csd[1],
+			card->raw_csd[2], card->raw_csd[3]);
+
+		buf = kmalloc(512, GFP_KERNEL);
+		if (buf) {
+			for (i = 0; i < 32; i++) {
+				for (j = 511 - (16 * i); j >= 496 - (16 * i); j--)
+					n += sprintf(buf + n, "%02x", ext_csd[j]);
+				n += sprintf(buf + n, "\n");
+				pr_info("%s: ext_csd_%03d %s",
+					mmc_hostname(card->host), 511 - (16 * i), buf);
+				n = 0;
+			}
+		}
+		if (buf)
+			kfree(buf);
+
+		/* Read eMMC firmware version */
+		if (card->cid.manfid == CID_MANFID_SANDISK ||
+		    card->cid.manfid == CID_MANFID_SANDISK_2) {
+			if (card->ext_csd.rev == 6)
+				card->cid.fwrev =
+				ext_csd[EXT_CSD_VENDOR_SPECIFIC_FIELDS_73] & 0x3F;
+			else if (card->ext_csd.rev > 6) { /* For eMMC 5.0 */
+				card->cid.fwrev =
+				ext_csd[EXT_CSD_VENDOR_SPECIFIC_FIELDS_258] - 0x30 ;
+
+				/* [FIXME] Workaround for SanDisk firmware bug */
+				check_fw = kmalloc(16, GFP_KERNEL);
+				if(check_fw) {
+					sprintf(check_fw, "%d%d%d%d%d%d",
+					ext_csd[254]-0x30, ext_csd[255]-0x30,
+					ext_csd[256]-0x30, ext_csd[257]-0x30,
+					ext_csd[258]-0x30, ext_csd[259]-0x30);
+				}
+				if(!strcmp(check_fw, "110224") ||
+					!strcmp(check_fw, "101149")) {
+					card->ext_csd.cmdq_support = 0;
+					card->ext_csd.cmdq_depth = 0;
+					card->ext_csd.barrier_support = 0;
+					card->ext_csd.cache_flush_policy = 0;
+				}
+				pr_info("%s: SanDisk: %s\n", mmc_hostname(card->host),
+					check_fw);
+				if(check_fw)
+					kfree(check_fw);
+			}
+
+		} else if (card->cid.manfid == CID_MANFID_MICRON) {
+			card->cid.fwrev = ext_csd[EXT_CSD_VENDOR_SPECIFIC_FIELDS_258];
+		}
+	}
+}
+
+/*
  * Decode extended CSD.
  */
 static int mmc_decode_ext_csd(struct mmc_card *card, u8 *ext_csd)
@@ -687,6 +758,11 @@ static int mmc_decode_ext_csd(struct mmc_card *card, u8 *ext_csd)
 		card->ext_csd.device_life_time_est_typ_b =
 			ext_csd[EXT_CSD_DEVICE_LIFE_TIME_EST_TYP_B];
 	}
+	
+	card->ext_csd.ffu_mode_op = ext_csd[EXT_CSD_FFU_FEATURES];
+	printk("%s: ext_csd[EXT_CSD_FFU_FEATURES]=%x \n", __func__, ext_csd[EXT_CSD_FFU_FEATURES]);
+	htc_mmc_show_cid_ext_csd(card, ext_csd);
+
 out:
 	return err;
 }
@@ -728,6 +804,7 @@ static int mmc_read_ext_csd(struct mmc_card *card)
 		return err;
 	}
 
+	card->cached_ext_csd = ext_csd;
 	err = mmc_decode_ext_csd(card, ext_csd);
 	kfree(ext_csd);
 	return err;
