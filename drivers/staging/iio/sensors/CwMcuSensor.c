@@ -5226,37 +5226,37 @@ error_ret:
 	return ret;
 }
 
-static int cw_probe_buffer(struct iio_dev *iio_dev)
-{
-	int ret;
-	struct iio_buffer *buffer;
+//static int cw_probe_buffer(struct iio_dev *iio_dev)
+//{
+	//int ret;
+	//struct iio_buffer *buffer;
 
-	buffer = iio_kfifo_allocate(iio_dev);
-	if (!buffer) {
-		ret = -ENOMEM;
-		goto error_ret;
-	}
+	//buffer = iio_kfifo_allocate();
+	//if (!buffer) {
+	//	ret = -ENOMEM;
+	//	goto error_ret;
+	//}
 
-	buffer->scan_timestamp = true;
-	iio_dev->buffer = buffer;
-	iio_dev->setup_ops = &cw_buffer_setup_ops;
-	iio_dev->modes |= INDIO_BUFFER_TRIGGERED;
-	ret = iio_buffer_register(iio_dev, iio_dev->channels,
-				  iio_dev->num_channels);
-	if (ret)
-		goto error_free_buf;
+	//buffer->scan_timestamp = true;
+	//iio_dev->buffer = buffer;
+	//iio_dev->setup_ops = &cw_buffer_setup_ops;
+	//iio_dev->modes |= INDIO_BUFFER_TRIGGERED;
+	//ret = iio_buffer_register(iio_dev, iio_dev->channels,
+	//			  iio_dev->num_channels);
+	//if (ret)
+	//	goto error_free_buf;
 
-	iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_ID);
-	iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_X);
-	iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_Y);
-	iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_Z);
-	return 0;
+	//iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_ID);
+	//iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_X);
+	//iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_Y);
+	//iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_Z);
+	//return 0;
 
-error_free_buf:
-	iio_kfifo_free(iio_dev->buffer);
-error_ret:
-	return ret;
-}
+//error_free_buf:
+//	iio_kfifo_free(iio_dev->buffer);
+//error_ret:
+	//return ret;
+//}
 
 
 static int cw_read_raw(struct iio_dev *indio_dev,
@@ -5613,7 +5613,7 @@ static int mcu_parse_dt(struct device *dev, struct cwmcu_data *pdata)
 		pdata->v_sr_2v85 = NULL;
 		E("%s: Unable to get v_sr_2v85\n", __func__);
 	} else {
-		rc = regulator_set_optimum_mode(pdata->v_sr_2v85, 100000);
+		rc = regulator_set_load(pdata->v_sr_2v85, 100000);
 		if (rc < 0) {
 			E("Unable to set HPM of regulator v_sr_2v85\n");
 			return 0;
@@ -5631,7 +5631,7 @@ static int mcu_parse_dt(struct device *dev, struct cwmcu_data *pdata)
 		pdata->v_srio_1v8 = NULL;
 		E("%s: Unable to get v_srio_1v8\n", __func__);
 	} else {
-		rc = regulator_set_optimum_mode(pdata->v_srio_1v8, 100000);
+		rc = regulator_set_load(pdata->v_srio_1v8, 100000);
 		if (rc < 0) {
 			E("Unable to set HPM of regulator v_srio_1v8\n");
 			return 0;
@@ -6125,11 +6125,11 @@ static void cwmcu_remove_trigger(struct iio_dev *indio_dev)
 	iio_trigger_free(mcu_data->trig);
 	iio_dealloc_pollfunc(indio_dev->pollfunc);
 }
-static void cwmcu_remove_buffer(struct iio_dev *indio_dev)
-{
-	iio_buffer_unregister(indio_dev);
-	iio_kfifo_free(indio_dev->buffer);
-}
+//static void cwmcu_remove_buffer(struct iio_dev *indio_dev)
+//{
+//	iio_buffer_unregister(indio_dev);
+//	iio_kfifo_free(indio_dev->buffer);
+//}
 
 static void cwmcu_one_shot(struct work_struct *work)
 {
@@ -8689,11 +8689,11 @@ static int CWMCU_probe_init(struct cwmcu_data *mcu_data,
 	INIT_DELAYED_WORK(&mcu_data->work, cwmcu_work_report);
 	INIT_WORK(&mcu_data->one_shot_work, cwmcu_one_shot);
 
-	error = cw_probe_buffer(indio_dev);
-	if (error) {
-		E("%s: iio cw_probe_buffer failed\n", __func__);
-		goto error_free_dev;
-	}
+	//error = cw_probe_buffer(indio_dev);
+	//if (error) {
+	//	E("%s: iio cw_probe_buffer failed\n", __func__);
+	//	goto error_free_dev;
+	//}
 	error = cw_probe_trigger(indio_dev);
 	if (error) {
 		E("%s: iio cw_probe_trigger failed\n", __func__);
@@ -8782,9 +8782,9 @@ error_remove_trigger:
 	if (indio_dev)
 		cwmcu_remove_trigger(indio_dev);
 error_remove_buffer:
-	if (indio_dev)
-		cwmcu_remove_buffer(indio_dev);
-error_free_dev:
+	//if (indio_dev)
+	//	cwmcu_remove_buffer(indio_dev);
+//error_free_dev:
 exit_mcu_parse_dt_fail:
 	return error;
 }
