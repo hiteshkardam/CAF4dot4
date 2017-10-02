@@ -596,6 +596,28 @@ config LEDS_QPNP
 	  LEDs in both PWM and light pattern generator (LPG) modes.  For older
 	  PMICs, it also supports WLEDs and flash LEDs.
 
+config LEDS_QPNP_RGB
+    tristate "Support for QPNP LEDs"
+    depends on LEDS_CLASS && SPMI
+    help
+      This driver supports the leds functionality of Qualcomm PNP PMIC.  It
+      includes RGB Leds.
+
+      To compile this driver as a module, choose M here: the module will
+      be called leds-qpnp.
+
+config LEDS_VIRTUAL_KEY_CHECK_SOURCE
+	tristate "Check virtual key LED power source"
+	depends on LEDS_QPNP_RGB
+	help
+		Check virtual key LED power source for dynamic probe if needed.
+
+config LEDS_SYNC_TOUCH_SOLUTION
+	bool "Sync touch solution to led driver"
+	default n
+	help
+		Sync touch solution to led driver
+
 config LEDS_QPNP_FLASH_V2
 	tristate "Support for QPNP V2 Flash LEDs"
 	depends on LEDS_CLASS && MFD_SPMI_PMIC
