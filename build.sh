@@ -52,7 +52,7 @@ export SUBARCH=arm64
 
 # make kernel
 
-make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out oldregen_defconfig
+make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out regen_defconfig
 make ARCH=arm64 CROSS_COMPILE=$TOOLCHAIN O=out -j`grep 'processor' /proc/cpuinfo | wc -l`
 
 # Grab zImage-dtb

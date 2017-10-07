@@ -41,8 +41,6 @@ struct ak_hall_data {
 	uint8_t  irq_enable;
 	uint8_t  att_used;
 	struct wake_lock wake_lock;
-	struct pinctrl *pinctrl;
-	struct pinctrl_state *pinctrl_state_active;
 };
 
 static struct ak_hall_data *g_hl;
@@ -174,35 +172,6 @@ static int hall_cover_sysfs_init(void)
 }
 
 #ifdef CONFIG_OF
-static int hall_pinctrl_init(struct ak_hall_data *hl, struct platform_device *pdev)
-{
-	int retval;
-
-	/* Get pinctrl if target uses pinctrl */
-	hl->pinctrl = devm_pinctrl_get(&pdev->dev);
-	if (IS_ERR_OR_NULL(hl->pinctrl)) {
-		retval = PTR_ERR(hl->pinctrl);
-		HL_ERR("Target does not use pinctrl %d\n", retval);
-		goto err_pinctrl_get;
-	}
-
-	hl->pinctrl_state_active
-		= pinctrl_lookup_state(hl->pinctrl, "default");
-	if (IS_ERR_OR_NULL(hl->pinctrl_state_active)) {
-		retval = PTR_ERR(hl->pinctrl_state_active);
-		HL_ERR("Can not lookup active pinstate %d\n", retval);
-		goto err_pinctrl_lookup;
-	}
-
-	HL_LOG("%s: pin ctrl end", __func__);
-	return 0;
-
-err_pinctrl_lookup:
-	devm_pinctrl_put(hl->pinctrl);
-err_pinctrl_get:
-	hl->pinctrl = NULL;
-	return retval;
-}
 
 static int hall_sensor_dt_parser(struct device_node *dt, struct hall_platform_data *pdata)
 {
@@ -335,7 +304,7 @@ static int hall_sensor_probe(struct platform_device *pdev)
 		goto err_alloc_mem_failed;
 	}
 
-	HL_LOG("+++++++20161215++++++++");
+	HL_LOG("++++++++++++++++++");
 	hl->hall_enable = 1;
 	if (pdev->dev.of_node) {
 		pdata = kzalloc(sizeof(*pdata), GFP_KERNEL);
@@ -357,12 +326,6 @@ static int hall_sensor_probe(struct platform_device *pdev)
 			ret = -ENOMEM;
 			goto err_alloc_pdata_mem_failed;
 		}
-	}
-
-	if (hall_pinctrl_init(hl, pdev) < 0) {
-		HL_ERR("pinctrl setup failed");
-		ret = -EPROBE_DEFER;
-		goto err_alloc_pdata_mem_failed;
 	}
 
 	if (pdata) {
@@ -428,7 +391,7 @@ static int hall_sensor_probe(struct platform_device *pdev)
 	hall_cover_sysfs_init();
 	g_hl = hl;
 
-	HL_LOG("------------------N: %d  S: %d\n",prev_val_n, prev_val_s);
+	HL_LOG("------------------");
 	kfree(pdata);
 	return 0;
 err_request_irq_failed:

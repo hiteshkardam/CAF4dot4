@@ -14,11 +14,16 @@
 #include <dt-bindings/spmi/spmi.h>
 
 &spmi_bus {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	interrupt-controller;
+	#interrupt-cells = <3>;
+
 	qcom,pmi8994@2 {
-		compatible = "qcom,spmi-pmic";
-		reg = <0x2 SPMI_USID>;
-		#address-cells = <2>;
-		#size-cells = <0>;
+		spmi-slave-container;
+		reg = <0x2>;
+		#address-cells = <1>;
+		#size-cells = <1>;
 
 		pmi8994_revid: qcom,revid@100 {
 			compatible = "qcom,qpnp-revid";
@@ -416,10 +421,10 @@
 	};
 
 	qcom,pmi8994@3 {
-		compatible ="qcom,spmi-pmic";
-		reg = <0x3 SPMI_USID>;
-		#address-cells = <2>;
-		#size-cells = <0>;
+		spmi-slave-container;
+		reg = <0x3>;
+		#address-cells = <1>;
+		#size-cells = <1>;
 
 		pmi8994_pwm_1: pwm@b100 {
 			compatible = "qcom,qpnp-pwm";

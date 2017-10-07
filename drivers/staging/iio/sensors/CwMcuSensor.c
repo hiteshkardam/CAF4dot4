@@ -5241,10 +5241,6 @@ static int cw_probe_buffer(struct iio_dev *iio_dev)
 	iio_dev->buffer = buffer;
 	iio_dev->setup_ops = &cw_buffer_setup_ops;
 	iio_dev->modes |= INDIO_BUFFER_TRIGGERED;
-	ret = iio_buffer_register(iio_dev, iio_dev->channels,
-				  iio_dev->num_channels);
-	if (ret)
-		goto error_free_buf;
 
 	iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_ID);
 	iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_X);
@@ -5252,8 +5248,6 @@ static int cw_probe_buffer(struct iio_dev *iio_dev)
 	iio_scan_mask_set(iio_dev, iio_dev->buffer, CW_SCAN_Z);
 	return 0;
 
-error_free_buf:
-	iio_kfifo_free(iio_dev->buffer);
 error_ret:
 	return ret;
 }
@@ -6125,11 +6119,7 @@ static void cwmcu_remove_trigger(struct iio_dev *indio_dev)
 	iio_trigger_free(mcu_data->trig);
 	iio_dealloc_pollfunc(indio_dev->pollfunc);
 }
-static void cwmcu_remove_buffer(struct iio_dev *indio_dev)
-{
-	iio_buffer_unregister(indio_dev);
-	iio_kfifo_free(indio_dev->buffer);
-}
+
 
 static void cwmcu_one_shot(struct work_struct *work)
 {
@@ -8697,7 +8687,6 @@ static int CWMCU_probe_init(struct cwmcu_data *mcu_data,
 	error = cw_probe_trigger(indio_dev);
 	if (error) {
 		E("%s: iio cw_probe_trigger failed\n", __func__);
-		goto error_remove_buffer;
 	}
 	error = iio_device_register(indio_dev);
 	if (error) {
@@ -8781,9 +8770,7 @@ err_free_mem:
 error_remove_trigger:
 	if (indio_dev)
 		cwmcu_remove_trigger(indio_dev);
-error_remove_buffer:
-	if (indio_dev)
-		cwmcu_remove_buffer(indio_dev);
+
 error_free_dev:
 exit_mcu_parse_dt_fail:
 	return error;

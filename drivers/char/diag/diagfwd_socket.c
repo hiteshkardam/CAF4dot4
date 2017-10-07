@@ -290,6 +290,7 @@ static void socket_data_ready(struct sock *sk_ptr)
 	info->data_ready++;
 	spin_unlock_irqrestore(&info->lock, flags);
 	diag_ws_on_notify();
+	DIAG_DBUG("socket data ready = %d\n",info->data_ready);
 
 	queue_work(info->wq, &(info->read_work));
 	wake_up_interruptible(&info->read_wait_q);
@@ -495,6 +496,12 @@ static void __socket_close_channel(struct diag_socket_info *info)
 
 	if (!atomic_read(&info->opened))
 		return;
+		
+/*++ 2015/10/26, USB Team, PCN00030 ++*/
+	if (cntl_socket)
+		wake_up(&cntl_socket->read_wait_q);
+	wake_up(&info->read_wait_q);
+/*-- 2015/10/26, USB Team, PCN00030 --*/
 
 	if (bootup_req[info->peripheral] == PEPIPHERAL_SSR_UP) {
 		DIAG_LOG(DIAG_DEBUG_PERIPHERALS,
