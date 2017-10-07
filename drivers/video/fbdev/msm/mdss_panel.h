@@ -308,6 +308,8 @@ enum mdss_intf_events {
 	MDSS_EVENT_DSI_TIMING_DB_CTRL,
 	MDSS_EVENT_AVR_MODE,
 	MDSS_EVENT_REGISTER_CLAMP_HANDLER,
+	MDSS_EVENT_PANEL_VDDIO_SWITCH_ON,
+	MDSS_EVENT_PANEL_VDDIO_SWITCH_OFF,
 	MDSS_EVENT_MAX,
 };
 
@@ -774,6 +776,17 @@ struct mdss_panel_hdr_properties {
 	u32 blackness_level;
 };
 
+struct htc_backlight1_table {
+	int size;
+	u16 *brt_data;
+	u16 *bl_data;
+};
+
+enum {
+	PANEL_POWER_CTRL_DEFAULT,
+	PANEL_POWER_CTRL_HX8396C2,
+	};
+
 struct mdss_panel_info {
 	u32 xres;
 	u32 yres;
@@ -928,6 +941,11 @@ struct mdss_panel_info {
 
 	/* esc clk recommended for the panel */
 	u32 esc_clk_rate_hz;
+	
+	/*HTC add as below*/
+	struct htc_backlight1_table brt_bl_table;
+	int camera_blk;
+	int power_ctrl;
 };
 
 struct mdss_panel_timing {
