@@ -1814,7 +1814,7 @@ static int hdmi_tx_init_edid(struct hdmi_tx_ctrl *hdmi_ctrl)
 	int rc = 0;
 
 	edid_init_data.kobj = hdmi_ctrl->kobj;
-	edid_init_data.ds_data = hdmi_ctrl->ds_data;
+	edid_init_data.ds_data = &hdmi_ctrl->ds_data;
 	edid_init_data.max_pclk_khz = hdmi_ctrl->max_pclk_khz;
 
 	edid_data = hdmi_edid_init(&edid_init_data);

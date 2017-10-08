@@ -438,7 +438,7 @@ static ssize_t hdmi_edid_sysfs_rda_res_info_data(struct device *dev,
 
 	for (i = 0; i < no_of_elem; i++) {
 		ret = hdmi_get_supported_mode(&info,
-			&edid_ctrl->init_data.ds_data,
+			edid_ctrl->init_data.ds_data,
 			minfo->video_format);
 
 		if (edid_ctrl->edid_override &&
@@ -554,7 +554,7 @@ static ssize_t hdmi_edid_sysfs_rda_res_info(struct device *dev,
 
 	for (; i < no_of_elem && size_to_write < PAGE_SIZE; i++) {
 		ret = hdmi_get_supported_mode(&info,
-			&edid_ctrl->init_data.ds_data,
+			edid_ctrl->init_data.ds_data,
 			minfo->video_format);
 
 		if (edid_ctrl->edid_override &&
@@ -937,7 +937,7 @@ static void hdmi_edid_add_sink_y420_format(struct hdmi_edid_ctrl *edid_ctrl,
 {
 	struct msm_hdmi_mode_timing_info timing = {0};
 	u32 ret = hdmi_get_supported_mode(&timing,
-				&edid_ctrl->init_data.ds_data,
+				edid_ctrl->init_data.ds_data,
 				video_format);
 	u32 supported = hdmi_edid_is_mode_supported(edid_ctrl,
 				&timing, MDP_Y_CBCR_H2V2);
@@ -1706,7 +1706,7 @@ static void hdmi_edid_add_sink_video_format(struct hdmi_edid_ctrl *edid_ctrl,
 {
 	struct msm_hdmi_mode_timing_info timing = {0};
 	u32 ret = hdmi_get_supported_mode(&timing,
-				&edid_ctrl->init_data.ds_data,
+				edid_ctrl->init_data.ds_data,
 				video_format);
 	u32 supported = hdmi_edid_is_mode_supported(edid_ctrl,
 				&timing, MDP_RGBA_8888);
